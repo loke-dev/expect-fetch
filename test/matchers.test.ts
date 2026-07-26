@@ -315,4 +315,30 @@ describe('request matchers', () => {
       /Fetch API Response/,
     );
   });
+
+  test('rejects malformed structural lookalikes with matcher guidance', () => {
+    const responseLike = {
+      status: 200,
+      headers: {},
+      clone: null,
+    };
+    const requestLike = {
+      method: 42,
+      url: new URL('https://example.test'),
+      headers: new Headers(),
+      clone() {
+        return this;
+      },
+    };
+
+    expect(() => expect(responseLike).toHaveStatus(200)).toThrow(
+      /Fetch API Response/,
+    );
+    expect(() => expect(requestLike).toHaveMethod('GET')).toThrow(
+      /Fetch API Request/,
+    );
+    expect(() => expect(responseLike).toHaveHeader('content-type')).toThrow(
+      /Fetch API Request or Response/,
+    );
+  });
 });

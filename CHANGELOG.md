@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Ignore malformed `Max-Age` cookie attributes instead of treating them as
   valid numeric values.
 - Normalize cookie domains to lowercase without an obsolete leading dot.
+- Reject malformed Request and Response lookalikes with clear matcher errors.
 
 ## 0.1.0 - 2026-07-26
 

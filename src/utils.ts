@@ -29,11 +29,8 @@ export function requireResponse(
   received: unknown,
 ): MatcherResult | undefined {
   if (
-    received === null ||
-    typeof received !== 'object' ||
-    !('status' in received) ||
-    !('headers' in received) ||
-    !('clone' in received)
+    !isFetchMessageLike(received) ||
+    typeof (received as { status?: unknown }).status !== 'number'
   ) {
     return matcherError(
       context,
@@ -51,12 +48,9 @@ export function requireRequest(
   received: unknown,
 ): MatcherResult | undefined {
   if (
-    received === null ||
-    typeof received !== 'object' ||
-    !('method' in received) ||
-    !('url' in received) ||
-    !('headers' in received) ||
-    !('clone' in received)
+    !isFetchMessageLike(received) ||
+    typeof (received as { method?: unknown }).method !== 'string' ||
+    typeof (received as { url?: unknown }).url !== 'string'
   ) {
     return matcherError(
       context,
@@ -73,12 +67,7 @@ export function requireFetchMessage(
   matcherName: string,
   received: unknown,
 ): MatcherResult | undefined {
-  if (
-    received === null ||
-    typeof received !== 'object' ||
-    !('headers' in received) ||
-    !('clone' in received)
-  ) {
+  if (!isFetchMessageLike(received)) {
     return matcherError(
       context,
       matcherName,
@@ -87,6 +76,19 @@ export function requireFetchMessage(
   }
 
   return undefined;
+}
+
+function isFetchMessageLike(value: unknown): boolean {
+  if (value === null || typeof value !== 'object') return false;
+  const message = value as { clone?: unknown; headers?: unknown };
+  if (typeof message.clone !== 'function') return false;
+  if (message.headers === null || typeof message.headers !== 'object') {
+    return false;
+  }
+  const headers = message.headers as { entries?: unknown; get?: unknown };
+  return (
+    typeof headers.get === 'function' && typeof headers.entries === 'function'
+  );
 }
 
 export function matchesValue(
