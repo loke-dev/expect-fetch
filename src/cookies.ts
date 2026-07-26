@@ -192,7 +192,14 @@ function matchesExpires(
   }
 
   if (expected instanceof Date) {
-    return new Date(actual).getTime() === expected.getTime();
+    const actualTime = new Date(actual).getTime();
+    const expectedTime = expected.getTime();
+
+    return (
+      Number.isFinite(actualTime) &&
+      Number.isFinite(expectedTime) &&
+      Math.floor(actualTime / 1_000) === Math.floor(expectedTime / 1_000)
+    );
   }
 
   return actual === expected;

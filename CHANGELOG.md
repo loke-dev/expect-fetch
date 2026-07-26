@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Preserve reusable regular expressions when evaluating matcher expectations.
 - Match `Domain` and `SameSite` cookie expectations case-insensitively and
   ignore obsolete leading dots in expected domains.
+- Match `Date` cookie expiration expectations at HTTP-date second precision.
 
 ## 0.1.0 - 2026-07-26
 

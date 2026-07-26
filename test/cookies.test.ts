@@ -104,6 +104,28 @@ describe('cookieMatches', () => {
     ).toBe(true);
   });
 
+  test('matches Date expectations at HTTP-date second precision', () => {
+    const cookie = {
+      name: 'session',
+      value: 'abc123',
+      expires: 'Wed, 21 Oct 2037 07:28:00 GMT',
+      secure: false,
+      httpOnly: false,
+    };
+
+    expect(
+      cookieMatches(cookie, {
+        expires: new Date('2037-10-21T07:28:00.999Z'),
+      }),
+    ).toBe(true);
+    expect(
+      cookieMatches(cookie, {
+        expires: new Date('2037-10-21T07:28:01.000Z'),
+      }),
+    ).toBe(false);
+    expect(cookieMatches(cookie, { expires: new Date('invalid') })).toBe(false);
+  });
+
   test('does not mutate reusable regular expressions', () => {
     const expectedValue = /^abc/g;
     const expectedExpires = /2037/g;
