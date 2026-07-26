@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  cookieMatches,
   parseSetCookie,
   splitCombinedSetCookie,
 } from '../src/cookies.js';
@@ -83,5 +84,29 @@ describe('parseSetCookie', () => {
       path: '/app',
       sameSite: 'lax',
     });
+  });
+});
+
+describe('cookieMatches', () => {
+  test('does not mutate reusable regular expressions', () => {
+    const expectedValue = /^abc/g;
+    const expectedExpires = /2037/g;
+    expectedValue.lastIndex = 2;
+    expectedExpires.lastIndex = 3;
+
+    expect(
+      cookieMatches(
+        {
+          name: 'session',
+          value: 'abc123',
+          expires: 'Wed, 21 Oct 2037 07:28:00 GMT',
+          secure: false,
+          httpOnly: false,
+        },
+        { value: expectedValue, expires: expectedExpires },
+      ),
+    ).toBe(true);
+    expect(expectedValue.lastIndex).toBe(2);
+    expect(expectedExpires.lastIndex).toBe(3);
   });
 });

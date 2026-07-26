@@ -117,6 +117,15 @@ describe('toHaveText', () => {
     await expect(response).toHaveText(/found$/);
     await expect(response.text()).resolves.toBe('Not found');
   });
+
+  test('does not mutate reusable regular expressions', async () => {
+    const expected = /found$/g;
+    expected.lastIndex = 2;
+
+    await expect(new Response('Not found')).toHaveText(expected);
+
+    expect(expected.lastIndex).toBe(2);
+  });
 });
 
 describe('toRedirectTo', () => {

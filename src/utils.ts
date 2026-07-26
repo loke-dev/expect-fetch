@@ -96,11 +96,20 @@ export function matchesValue(
   expected: HeaderExpectation,
 ): boolean {
   if (expected instanceof RegExp) {
-    expected.lastIndex = 0;
-    return expected.test(actual);
+    return matchesRegExp(actual, expected);
   }
 
   return actual === expected;
+}
+
+export function matchesRegExp(actual: string, expected: RegExp): boolean {
+  const lastIndex = expected.lastIndex;
+  try {
+    expected.lastIndex = 0;
+    return expected.test(actual);
+  } finally {
+    expected.lastIndex = lastIndex;
+  }
 }
 
 export function redactHeaderValue(name: string, value: unknown): unknown {

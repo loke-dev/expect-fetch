@@ -1,4 +1,5 @@
 import type { CookieExpectation, ParsedCookie } from './types.js';
+import { matchesRegExp } from './utils.js';
 
 export function getSetCookieHeaders(headers: Headers): string[] {
   const getSetCookie = Reflect.get(headers, 'getSetCookie') as unknown;
@@ -144,8 +145,7 @@ function matchesString(
   }
 
   if (expected instanceof RegExp) {
-    expected.lastIndex = 0;
-    return expected.test(actual);
+    return matchesRegExp(actual, expected);
   }
 
   return actual === expected;
@@ -171,8 +171,7 @@ function matchesExpires(
   }
 
   if (expected instanceof RegExp) {
-    expected.lastIndex = 0;
-    return expected.test(actual);
+    return matchesRegExp(actual, expected);
   }
 
   if (expected instanceof Date) {
