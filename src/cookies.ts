@@ -31,13 +31,18 @@ export function parseSetCookie(value: string): ParsedCookie | undefined {
   }
 
   const equalsIndex = pair.indexOf('=');
-  if (equalsIndex <= 0) {
+  if (equalsIndex === -1) {
+    return undefined;
+  }
+
+  const name = pair.slice(0, equalsIndex).trim();
+  if (!name) {
     return undefined;
   }
 
   const cookie: ParsedCookie = {
-    name: pair.slice(0, equalsIndex),
-    value: pair.slice(equalsIndex + 1),
+    name,
+    value: pair.slice(equalsIndex + 1).trim(),
     secure: false,
     httpOnly: false,
   };
@@ -47,11 +52,11 @@ export function parseSetCookie(value: string): ParsedCookie | undefined {
     const rawName =
       attributeEqualsIndex === -1
         ? attribute
-        : attribute.slice(0, attributeEqualsIndex);
+        : attribute.slice(0, attributeEqualsIndex).trim();
     const rawValue =
       attributeEqualsIndex === -1
         ? undefined
-        : attribute.slice(attributeEqualsIndex + 1);
+        : attribute.slice(attributeEqualsIndex + 1).trim();
 
     switch (rawName.toLowerCase()) {
       case 'domain':

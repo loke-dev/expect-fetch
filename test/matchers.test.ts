@@ -182,6 +182,22 @@ describe('toSetCookie', () => {
     });
   });
 
+  test('matches browser-tolerated whitespace around cookie fields', () => {
+    const response = new Response(null, {
+      headers: {
+        'set-cookie':
+          ' session = abc123 ; Domain = .EXAMPLE.COM ; Path = / ; SameSite = Lax ',
+      },
+    });
+
+    expect(response).toSetCookie('session', {
+      value: 'abc123',
+      domain: 'example.com',
+      path: '/',
+      sameSite: 'lax',
+    });
+  });
+
   test('reports absent cookies', () => {
     const response = new Response();
 

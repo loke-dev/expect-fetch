@@ -59,4 +59,18 @@ describe('parseSetCookie', () => {
       domain: 'example.com',
     });
   });
+
+  test('trims whitespace around cookie and attribute values', () => {
+    expect(
+      parseSetCookie(
+        ' session \t= \tabc=123 \t; Domain \t= .EXAMPLE.COM \t; Path = /app ; SameSite = Lax ',
+      ),
+    ).toMatchObject({
+      name: 'session',
+      value: 'abc=123',
+      domain: 'example.com',
+      path: '/app',
+      sameSite: 'lax',
+    });
+  });
 });
