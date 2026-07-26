@@ -12,11 +12,20 @@
   ],
   "license": "MIT",
   "author": "Loke <hi@loke.dev>",
+  "homepage": "https://github.com/loke-dev/expect-fetch#readme",
+  "bugs": {
+    "url": "https://github.com/loke-dev/expect-fetch/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loke-dev/expect-fetch.git"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "exports": {
@@ -34,6 +43,7 @@
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "npm@11.16.0",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check": "tsc --noEmit && npm run lint",
