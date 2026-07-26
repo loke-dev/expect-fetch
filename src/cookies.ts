@@ -126,13 +126,13 @@ export function cookieMatches(
 ): boolean {
   return (
     matchesString(cookie.value, expected.value) &&
-    matchesOptional(cookie.domain, expected.domain) &&
+    matchesDomain(cookie.domain, expected.domain) &&
     matchesOptional(cookie.path, expected.path) &&
     matchesExpires(cookie.expires, expected.expires) &&
     matchesOptional(cookie.maxAge, expected.maxAge) &&
     matchesOptional(cookie.secure, expected.secure) &&
     matchesOptional(cookie.httpOnly, expected.httpOnly) &&
-    matchesOptional(cookie.sameSite, expected.sameSite)
+    matchesSameSite(cookie.sameSite, expected.sameSite)
   );
 }
 
@@ -156,6 +156,23 @@ function matchesOptional<T>(
   expected: T | undefined,
 ): boolean {
   return expected === undefined || actual === expected;
+}
+
+function matchesDomain(
+  actual: string | undefined,
+  expected: string | undefined,
+): boolean {
+  return (
+    expected === undefined ||
+    actual === expected.replace(/^\./, '').toLowerCase()
+  );
+}
+
+function matchesSameSite(
+  actual: string | undefined,
+  expected: string | undefined,
+): boolean {
+  return expected === undefined || actual === expected.toLowerCase();
 }
 
 function matchesExpires(

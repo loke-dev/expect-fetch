@@ -162,6 +162,8 @@ expect(response).toSetCookie('session', {
 
 Supported expectations are `value`, `domain`, `path`, `expires`, `maxAge`,
 `secure`, `httpOnly`, and `sameSite`. Omitted fields are not checked.
+`domain` and `sameSite` comparisons are case-insensitive, and an obsolete
+leading dot in a domain expectation is ignored.
 
 `Set-Cookie` is intentionally supported for server-side response tests. Browsers
 do not expose this response header to client-side JavaScript.

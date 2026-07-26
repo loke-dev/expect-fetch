@@ -88,6 +88,22 @@ describe('parseSetCookie', () => {
 });
 
 describe('cookieMatches', () => {
+  test('matches Domain and SameSite expectations case-insensitively', () => {
+    expect(
+      cookieMatches(
+        {
+          name: 'session',
+          value: 'abc123',
+          domain: 'example.com',
+          sameSite: 'lax',
+          secure: false,
+          httpOnly: false,
+        },
+        { domain: '.EXAMPLE.COM', sameSite: 'Lax' },
+      ),
+    ).toBe(true);
+  });
+
   test('does not mutate reusable regular expressions', () => {
     const expectedValue = /^abc/g;
     const expectedExpires = /2037/g;

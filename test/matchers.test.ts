@@ -163,11 +163,11 @@ describe('toSetCookie', () => {
     expect(response).toSetCookie('session');
     expect(response).toSetCookie('session', {
       value: /^abc/,
-      domain: 'example.com',
+      domain: '.EXAMPLE.COM',
       path: '/',
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'Lax',
       maxAge: 3600,
     });
   });

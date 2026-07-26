@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
 - Keep quoted cookie-extension commas within their original cookie.
 - Reject malformed Request and Response lookalikes with clear matcher errors.
 - Preserve reusable regular expressions when evaluating matcher expectations.
+- Match `Domain` and `SameSite` cookie expectations case-insensitively and
+  ignore obsolete leading dots in expected domains.
 
 ## 0.1.0 - 2026-07-26
 
