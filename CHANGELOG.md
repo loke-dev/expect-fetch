@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - Redact authorization and cookie values from matcher failure diagnostics.
 - Preserve query and form field names that overlap object prototype properties.
+- Ignore malformed `Max-Age` cookie attributes instead of treating them as
+  valid numeric values.
 
 ## 0.1.0 - 2026-07-26
 

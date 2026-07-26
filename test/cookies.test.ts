@@ -35,4 +35,22 @@ describe('parseSetCookie', () => {
       maxAge: 60,
     });
   });
+
+  test('accepts integer Max-Age values and ignores malformed values', () => {
+    expect(parseSetCookie('session=abc; Max-Age=0')).toMatchObject({
+      maxAge: 0,
+    });
+    expect(parseSetCookie('session=abc; Max-Age=-1')).toMatchObject({
+      maxAge: -1,
+    });
+    expect(parseSetCookie('session=abc; Max-Age=')).not.toHaveProperty(
+      'maxAge',
+    );
+    expect(parseSetCookie('session=abc; Max-Age=1.5')).not.toHaveProperty(
+      'maxAge',
+    );
+    expect(parseSetCookie('session=abc; Max-Age=12seconds')).not.toHaveProperty(
+      'maxAge',
+    );
+  });
 });

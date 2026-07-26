@@ -64,9 +64,11 @@ export function parseSetCookie(value: string): ParsedCookie | undefined {
         if (rawValue !== undefined) cookie.expires = rawValue;
         break;
       case 'max-age': {
-        const maxAge = Number(rawValue);
-        if (Number.isFinite(maxAge)) {
-          cookie.maxAge = maxAge;
+        if (rawValue !== undefined && /^-?\d+$/.test(rawValue)) {
+          const maxAge = Number(rawValue);
+          if (Number.isFinite(maxAge)) {
+            cookie.maxAge = maxAge;
+          }
         }
         break;
       }
