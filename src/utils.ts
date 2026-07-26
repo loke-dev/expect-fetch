@@ -10,6 +10,7 @@ const SENSITIVE_HEADER_NAMES = new Set([
   'proxy-authorization',
   'set-cookie',
 ]);
+const SENSITIVE_HEADER_SUFFIX = /(?:^|-)(?:api-key|token|secret)$/;
 
 export function matcherError(
   context: MatcherContext,
@@ -113,7 +114,12 @@ export function matchesRegExp(actual: string, expected: RegExp): boolean {
 }
 
 export function redactHeaderValue(name: string, value: unknown): unknown {
-  return SENSITIVE_HEADER_NAMES.has(name.toLowerCase())
+  const normalizedName = name.toLowerCase();
+
+  return (
+    SENSITIVE_HEADER_NAMES.has(normalizedName) ||
+      SENSITIVE_HEADER_SUFFIX.test(normalizedName)
+  )
     ? '[redacted]'
     : value;
 }

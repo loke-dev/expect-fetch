@@ -41,7 +41,10 @@ describe('toHaveHeader', () => {
     const request = new Request('https://example.test/users', {
       headers: {
         authorization: 'Bearer actual-secret',
+        'cf-access-client-secret': 'cloudflare-secret',
         cookie: 'session=cookie-secret',
+        'x-api-key': 'api-key-secret',
+        'x-auth-token': 'auth-token-secret',
         'x-request-id': 'req_123',
       },
     });
@@ -59,6 +62,9 @@ describe('toHaveHeader', () => {
     expect(message).toContain('[redacted]');
     expect(message).toContain('req_123');
     expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('api-key-secret');
+    expect(message).not.toContain('auth-token-secret');
+    expect(message).not.toContain('cloudflare-secret');
     expect(message).not.toContain('expected-secret');
     expect(message).not.toContain('cookie-secret');
   });
