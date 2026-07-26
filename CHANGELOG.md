@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Changed
+
+- Describe native `Request` support in the package metadata.
+
 ### Fixed
 
 - Redact authorization and cookie values from matcher failure diagnostics.

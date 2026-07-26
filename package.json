@@ -1,9 +1,10 @@
 {
   "name": "expect-fetch",
   "version": "0.1.0",
-  "description": "Expressive Vitest matchers for native Fetch API responses",
+  "description": "Expressive Vitest matchers for native Fetch API requests and responses",
   "keywords": [
     "fetch",
+    "request",
     "response",
     "vitest",
     "testing",
