@@ -1,0 +1,60 @@
+{
+  "name": "expect-fetch",
+  "version": "0.1.0",
+  "description": "Expressive Vitest matchers for native Fetch API responses",
+  "keywords": [
+    "fetch",
+    "response",
+    "vitest",
+    "testing",
+    "matcher",
+    "http"
+  ],
+  "license": "MIT",
+  "author": "Loke <hi@loke.dev>",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./vitest": {
+      "types": "./dist/vitest.d.ts",
+      "import": "./dist/vitest.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "tsc --noEmit && npm run lint",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run check && npm test && npm run build"
+  },
+  "peerDependencies": {
+    "vitest": ">=2 <5"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.38.0",
+    "vitest": "^4.1.10"
+  }
+}
