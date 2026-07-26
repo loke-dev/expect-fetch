@@ -417,23 +417,19 @@ export const matchers = {
 function searchParamsToObject(
   searchParams: URLSearchParams,
 ): Record<string, string | string[]> {
-  const result: Record<string, string | string[]> = {};
-
-  for (const key of new Set(searchParams.keys())) {
+  const entries = [...new Set(searchParams.keys())].map((key) => {
     const values = searchParams.getAll(key);
-    result[key] = values.length === 1 ? values[0]! : values;
-  }
+    return [key, values.length === 1 ? values[0]! : values] as const;
+  });
 
-  return result;
+  return Object.fromEntries(entries);
 }
 
 function formDataToObject(formData: FormData): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-
-  for (const key of new Set(formData.keys())) {
+  const entries = [...new Set(formData.keys())].map((key) => {
     const values = formData.getAll(key);
-    result[key] = values.length === 1 ? values[0]! : values;
-  }
+    return [key, values.length === 1 ? values[0]! : values] as const;
+  });
 
-  return result;
+  return Object.fromEntries(entries);
 }

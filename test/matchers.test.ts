@@ -253,6 +253,19 @@ describe('request matchers', () => {
     });
   });
 
+  test('preserves query names that overlap object prototype properties', () => {
+    const request = new Request(
+      'https://example.test/search?__proto__=safe&constructor=native',
+    );
+
+    expect(request).toHaveQuery(
+      Object.fromEntries([
+        ['__proto__', 'safe'],
+        ['constructor', 'native'],
+      ]),
+    );
+  });
+
   test('matches form data and preserves the original body', async () => {
     const form = new FormData();
     form.append('name', 'Ada');
@@ -271,6 +284,23 @@ describe('request matchers', () => {
     await expect(request.formData()).resolves.toMatchObject({
       get: expect.any(Function),
     });
+  });
+
+  test('preserves form field names that overlap object prototype properties', async () => {
+    const form = new FormData();
+    form.append('__proto__', 'safe');
+    form.append('constructor', 'native');
+    const request = new Request('https://example.test/users', {
+      method: 'POST',
+      body: form,
+    });
+
+    await expect(request).toHaveFormData(
+      Object.fromEntries([
+        ['__proto__', 'safe'],
+        ['constructor', 'native'],
+      ]),
+    );
   });
 
   test('rejects response-only and request-only matcher inputs', () => {
