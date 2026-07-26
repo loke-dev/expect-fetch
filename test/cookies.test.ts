@@ -16,6 +16,17 @@ describe('splitCombinedSetCookie', () => {
       'theme=dark; Path=/',
     ]);
   });
+
+  test('does not split quoted extension attributes into phantom cookies', () => {
+    expect(
+      splitCombinedSetCookie(
+        'session=abc; Extension="high,phantom=value", theme=dark; Path=/',
+      ),
+    ).toEqual([
+      'session=abc; Extension="high,phantom=value"',
+      'theme=dark; Path=/',
+    ]);
+  });
 });
 
 describe('parseSetCookie', () => {

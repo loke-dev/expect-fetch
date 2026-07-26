@@ -16,10 +16,33 @@ export function getSetCookieHeaders(headers: Headers): string[] {
 }
 
 export function splitCombinedSetCookie(value: string): string[] {
-  return value
-    .split(/,(?=\s*[^;,=\s]+=[^;,]*)/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const parts: string[] = [];
+  let start = 0;
+  let quoted = false;
+
+  for (let index = 0; index < value.length; index += 1) {
+    if (value[index] === '"') {
+      let backslashes = 0;
+      for (
+        let cursor = index - 1;
+        cursor >= 0 && value[cursor] === '\\';
+        cursor -= 1
+      ) {
+        backslashes += 1;
+      }
+      if (backslashes % 2 === 0) quoted = !quoted;
+    } else if (
+      value[index] === ',' &&
+      !quoted &&
+      /^\s*[^;,=\s]+=[^;,]*/.test(value.slice(index + 1))
+    ) {
+      parts.push(value.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+
+  parts.push(value.slice(start).trim());
+  return parts.filter(Boolean);
 }
 
 export function parseSetCookie(value: string): ParsedCookie | undefined {
