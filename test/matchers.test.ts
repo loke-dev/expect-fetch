@@ -45,6 +45,8 @@ describe('toHaveHeader', () => {
         cookie: 'session=cookie-secret',
         'x-api-key': 'api-key-secret',
         'x-auth-token': 'auth-token-secret',
+        'x-user-password': 'user-password-value',
+        'x-credential': 'credential-value',
         'x-request-id': 'req_123',
       },
     });
@@ -67,6 +69,8 @@ describe('toHaveHeader', () => {
     expect(message).not.toContain('cloudflare-secret');
     expect(message).not.toContain('expected-secret');
     expect(message).not.toContain('cookie-secret');
+    expect(message).not.toContain('user-password-value');
+    expect(message).not.toContain('credential-value');
   });
 
   test('matches request headers', () => {

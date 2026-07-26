@@ -10,7 +10,8 @@ const SENSITIVE_HEADER_NAMES = new Set([
   'proxy-authorization',
   'set-cookie',
 ]);
-const SENSITIVE_HEADER_SUFFIX = /(?:^|-)(?:api-key|token|secret)$/;
+const SENSITIVE_HEADER_SUFFIX =
+  /(?:^|[-_])(?:access[-_]?token|api[-_]?key|password|credential|secret|token)$/;
 
 export function matcherError(
   context: MatcherContext,
