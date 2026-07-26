@@ -53,4 +53,10 @@ describe('parseSetCookie', () => {
       'maxAge',
     );
   });
+
+  test('normalizes cookie domains case-insensitively without a leading dot', () => {
+    expect(parseSetCookie('session=abc; Domain=.EXAMPLE.COM')).toMatchObject({
+      domain: 'example.com',
+    });
+  });
 });

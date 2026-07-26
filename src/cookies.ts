@@ -55,7 +55,9 @@ export function parseSetCookie(value: string): ParsedCookie | undefined {
 
     switch (rawName.toLowerCase()) {
       case 'domain':
-        if (rawValue !== undefined) cookie.domain = rawValue;
+        if (rawValue !== undefined) {
+          cookie.domain = rawValue.replace(/^\./, '').toLowerCase();
+        }
         break;
       case 'path':
         if (rawValue !== undefined) cookie.path = rawValue;

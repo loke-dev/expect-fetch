@@ -147,13 +147,14 @@ describe('toSetCookie', () => {
     const response = new Response(null, {
       headers: {
         'set-cookie':
-          'session=abc123; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600',
+          'session=abc123; Domain=.EXAMPLE.COM; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600',
       },
     });
 
     expect(response).toSetCookie('session');
     expect(response).toSetCookie('session', {
       value: /^abc/,
+      domain: 'example.com',
       path: '/',
       httpOnly: true,
       secure: true,

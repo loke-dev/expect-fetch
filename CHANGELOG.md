@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Preserve query and form field names that overlap object prototype properties.
 - Ignore malformed `Max-Age` cookie attributes instead of treating them as
   valid numeric values.
+- Normalize cookie domains to lowercase without an obsolete leading dot.
 
 ## 0.1.0 - 2026-07-26
 
