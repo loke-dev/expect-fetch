@@ -186,3 +186,9 @@ and `Set-Cookie` values so credentials do not leak into test or CI logs.
 ## License
 
 MIT
+
+## Contributing and security
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development and release guidance.
+Please use the private process in [SECURITY.md](./SECURITY.md) to report
+vulnerabilities.
