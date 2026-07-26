@@ -18,6 +18,7 @@ import {
   formatHeaders,
   matcherError,
   matchesValue,
+  redactHeaderValue,
   requireFetchMessage,
   requireRequest,
   requireResponse,
@@ -65,6 +66,10 @@ export function toHaveHeader(
   const pass =
     actual !== null &&
     (expected === undefined || matchesValue(actual, expected));
+  const displayedActual =
+    actual === null ? null : redactHeaderValue(name, actual);
+  const displayedExpected =
+    expected === undefined ? undefined : redactHeaderValue(name, expected);
 
   return createResult(
     pass,
@@ -74,16 +79,16 @@ export function toHaveHeader(
         '',
         expected === undefined
           ? `Expected message to contain header ${this.utils.printExpected(name)}.`
-          : `Expected header:\n  ${name}: ${this.utils.printExpected(expected)}`,
+          : `Expected header:\n  ${name}: ${this.utils.printExpected(displayedExpected)}`,
         actual === null
           ? `Received header:\n  ${name}: (missing)`
-          : `Received header:\n  ${name}: ${this.utils.printReceived(actual)}`,
+          : `Received header:\n  ${name}: ${this.utils.printReceived(displayedActual)}`,
         '',
         'All headers:',
         formatHeaders(message.headers),
       ].join('\n'),
-    actual,
-    expected,
+    displayedActual,
+    displayedExpected,
   );
 }
 
@@ -363,6 +368,14 @@ export function toSetCookie(
     .filter((cookie) => cookie !== undefined);
   const namedCookies = cookies.filter((cookie) => cookie.name === name);
   const pass = namedCookies.some((cookie) => cookieMatches(cookie, expected));
+  const displayedCookies = namedCookies.map((cookie) => ({
+    ...cookie,
+    value: '[redacted]',
+  }));
+  const displayedExpected =
+    expected.value === undefined
+      ? expected
+      : { ...expected, value: '[redacted]' };
 
   return createResult(
     pass,
@@ -371,20 +384,20 @@ export function toSetCookie(
         this.utils.matcherHint('toSetCookie'),
         '',
         `Expected cookie ${this.utils.printExpected(name)} with:`,
-        `  ${this.utils.printExpected(expected)}`,
+        `  ${this.utils.printExpected(displayedExpected)}`,
         '',
         namedCookies.length === 0
           ? `No cookie named ${this.utils.printExpected(name)} was found.`
-          : `Received matching-name cookies:\n${namedCookies
+          : `Received matching-name cookies:\n${displayedCookies
               .map((cookie) => `  ${this.utils.printReceived(cookie)}`)
               .join('\n')}`,
         '',
         rawCookies.length === 0
           ? 'The response did not contain any Set-Cookie headers.'
-          : `All Set-Cookie headers:\n${rawCookies.map((cookie) => `  ${cookie}`).join('\n')}`,
+          : `All Set-Cookie headers:\n${rawCookies.map(() => '  [redacted]').join('\n')}`,
       ].join('\n'),
-    namedCookies,
-    expected,
+    displayedCookies,
+    displayedExpected,
   );
 }
 

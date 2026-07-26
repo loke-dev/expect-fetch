@@ -4,6 +4,13 @@ import type {
   MatcherResult,
 } from './types.js';
 
+const SENSITIVE_HEADER_NAMES = new Set([
+  'authorization',
+  'cookie',
+  'proxy-authorization',
+  'set-cookie',
+]);
+
 export function matcherError(
   context: MatcherContext,
   matcherName: string,
@@ -94,6 +101,12 @@ export function matchesValue(
   return actual === expected;
 }
 
+export function redactHeaderValue(name: string, value: unknown): unknown {
+  return SENSITIVE_HEADER_NAMES.has(name.toLowerCase())
+    ? '[redacted]'
+    : value;
+}
+
 export function formatHeaders(headers: Headers): string {
   const entries = [...headers.entries()].sort(([a], [b]) =>
     a.localeCompare(b),
@@ -103,7 +116,9 @@ export function formatHeaders(headers: Headers): string {
     return '  (none)';
   }
 
-  return entries.map(([name, value]) => `  ${name}: ${value}`).join('\n');
+  return entries
+    .map(([name, value]) => `  ${name}: ${redactHeaderValue(name, value)}`)
+    .join('\n');
 }
 
 export function responseSummary(response: Response): string {

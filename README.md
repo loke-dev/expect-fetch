@@ -180,6 +180,8 @@ They solve different problems and can be used together.
 
 The matchers use structural checks rather than `instanceof Response`, allowing
 responses created in another JavaScript realm or by compatible runtimes.
+Failure diagnostics redact `Authorization`, `Proxy-Authorization`, `Cookie`,
+and `Set-Cookie` values so credentials do not leak into test or CI logs.
 
 ## License
 

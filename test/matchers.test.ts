@@ -37,6 +37,32 @@ describe('toHaveHeader', () => {
     );
   });
 
+  test('redacts sensitive values from failure messages', () => {
+    const request = new Request('https://example.test/users', {
+      headers: {
+        authorization: 'Bearer actual-secret',
+        cookie: 'session=cookie-secret',
+        'x-request-id': 'req_123',
+      },
+    });
+
+    let message = '';
+    try {
+      expect(request).toHaveHeader(
+        'authorization',
+        'Bearer expected-secret',
+      );
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('[redacted]');
+    expect(message).toContain('req_123');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+    expect(message).not.toContain('cookie-secret');
+  });
+
   test('matches request headers', () => {
     const request = new Request('https://example.test/users', {
       headers: { authorization: 'Bearer token' },
@@ -161,6 +187,31 @@ describe('toSetCookie', () => {
     expect(() => expect(response).toSetCookie('session')).toThrow(
       /did not contain any Set-Cookie/,
     );
+  });
+
+  test('redacts cookie values from failure messages', () => {
+    const response = new Response(null, {
+      headers: {
+        'set-cookie':
+          'session=actual-secret; Path=/; HttpOnly, theme=private-value; Path=/',
+      },
+    });
+
+    let message = '';
+    try {
+      expect(response).toSetCookie('session', {
+        value: 'expected-secret',
+        secure: true,
+      });
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('[redacted]');
+    expect(message).toContain('httpOnly');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+    expect(message).not.toContain('private-value');
   });
 });
 
