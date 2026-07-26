@@ -36,6 +36,14 @@ describe('toHaveHeader', () => {
       /missing/,
     );
   });
+
+  test('matches request headers', () => {
+    const request = new Request('https://example.test/users', {
+      headers: { authorization: 'Bearer token' },
+    });
+
+    expect(request).toHaveHeader('authorization', /^Bearer /);
+  });
 });
 
 describe('toHaveJson', () => {
@@ -61,6 +69,17 @@ describe('toHaveJson', () => {
     await expect(expect(response).toHaveJson({ ok: true })).rejects.toThrow(
       /could not be parsed/,
     );
+  });
+
+  test('matches a request body without consuming it', async () => {
+    const request = new Request('https://example.test/users', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Ada' }),
+    });
+
+    await expect(request).toHaveJson({ name: 'Ada' });
+    await expect(request.json()).resolves.toEqual({ name: 'Ada' });
   });
 });
 
@@ -141,6 +160,77 @@ describe('toSetCookie', () => {
 
     expect(() => expect(response).toSetCookie('session')).toThrow(
       /did not contain any Set-Cookie/,
+    );
+  });
+});
+
+describe('request matchers', () => {
+  test('matches methods case-insensitively', () => {
+    const request = new Request('https://example.test/users', {
+      method: 'POST',
+    });
+
+    expect(request).toHaveMethod('post');
+    expect(() => expect(request).toHaveMethod('GET')).toThrow(
+      /Received method/,
+    );
+  });
+
+  test('matches relative, absolute, URL, and patterned URLs', () => {
+    const request = new Request(
+      'https://example.test/users?page=2#results',
+    );
+
+    expect(request).toHaveUrl('/users?page=2#results');
+    expect(request).toHaveUrl(
+      'https://example.test/users?page=2#results',
+    );
+    expect(request).toHaveUrl(
+      new URL('https://example.test/users?page=2#results'),
+    );
+    expect(request).toHaveUrl(/^https:\/\/example\.test\/users/);
+  });
+
+  test('matches decoded query values and repeated parameters', () => {
+    const request = new Request(
+      'https://example.test/search?q=Ada%20Lovelace&tag=math&tag=code',
+    );
+
+    expect(request).toHaveQuery({
+      q: 'Ada Lovelace',
+      tag: ['math', 'code'],
+    });
+  });
+
+  test('matches form data and preserves the original body', async () => {
+    const form = new FormData();
+    form.append('name', 'Ada');
+    form.append('role', 'admin');
+    form.append('role', 'author');
+    const request = new Request('https://example.test/users', {
+      method: 'POST',
+      body: form,
+    });
+
+    await expect(request).toHaveFormData({
+      name: 'Ada',
+      role: ['admin', 'author'],
+    });
+
+    await expect(request.formData()).resolves.toMatchObject({
+      get: expect.any(Function),
+    });
+  });
+
+  test('rejects response-only and request-only matcher inputs', () => {
+    const response = new Response();
+    const request = new Request('https://example.test');
+
+    expect(() => expect(response).toHaveMethod('GET')).toThrow(
+      /Fetch API Request/,
+    );
+    expect(() => expect(request).toHaveStatus(200)).toThrow(
+      /Fetch API Response/,
     );
   });
 });

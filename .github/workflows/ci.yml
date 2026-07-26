@@ -28,6 +28,28 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+      - run: npm run check:consumer
+
+  vitest-compatibility:
+    name: Vitest ${{ matrix.vitest }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        vitest: [2, 3, 4]
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save --package-lock=false vitest@${{ matrix.vitest }}
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:consumer
 
   package:
     name: Package integrity

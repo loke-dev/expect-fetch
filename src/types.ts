@@ -17,6 +17,9 @@ export interface MatcherContext {
 }
 
 export type HeaderExpectation = string | RegExp;
+export type UrlExpectation = string | URL | RegExp;
+export type QueryExpectation = Record<string, unknown>;
+export type FormDataExpectation = Record<string, unknown>;
 
 export interface CookieExpectation {
   value?: string | RegExp;

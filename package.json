@@ -47,10 +47,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check": "tsc --noEmit && npm run lint",
+    "check:consumer": "tsc -p test/consumer/tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "npm run check && npm test && npm run build"
+    "prepublishOnly": "npm run check && npm test && npm run build && npm run check:consumer"
   },
   "peerDependencies": {
     "vitest": ">=2 <5"

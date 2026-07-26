@@ -38,6 +38,50 @@ export function requireResponse(
   return undefined;
 }
 
+export function requireRequest(
+  context: MatcherContext,
+  matcherName: string,
+  received: unknown,
+): MatcherResult | undefined {
+  if (
+    received === null ||
+    typeof received !== 'object' ||
+    !('method' in received) ||
+    !('url' in received) ||
+    !('headers' in received) ||
+    !('clone' in received)
+  ) {
+    return matcherError(
+      context,
+      matcherName,
+      `Expected a Fetch API Request, but received ${context.utils.printReceived(received)}.`,
+    );
+  }
+
+  return undefined;
+}
+
+export function requireFetchMessage(
+  context: MatcherContext,
+  matcherName: string,
+  received: unknown,
+): MatcherResult | undefined {
+  if (
+    received === null ||
+    typeof received !== 'object' ||
+    !('headers' in received) ||
+    !('clone' in received)
+  ) {
+    return matcherError(
+      context,
+      matcherName,
+      `Expected a Fetch API Request or Response, but received ${context.utils.printReceived(received)}.`,
+    );
+  }
+
+  return undefined;
+}
+
 export function matchesValue(
   actual: string,
   expected: HeaderExpectation,
@@ -67,6 +111,18 @@ export function responseSummary(response: Response): string {
     `Response: ${response.status} ${response.statusText}`.trimEnd(),
     'Headers:',
     formatHeaders(response.headers),
+  ].join('\n');
+}
+
+export function fetchMessageSummary(message: Request | Response): string {
+  if ('status' in message) {
+    return responseSummary(message);
+  }
+
+  return [
+    `Request: ${message.method} ${message.url}`,
+    'Headers:',
+    formatHeaders(message.headers),
   ].join('\n');
 }
 

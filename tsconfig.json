@@ -11,5 +11,6 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src", "test", "eslint.config.js", "vitest.config.ts"]
+  "include": ["src", "test", "eslint.config.js", "vitest.config.ts"],
+  "exclude": ["test/consumer"]
 }

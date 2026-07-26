@@ -5,15 +5,21 @@ import {
 } from './cookies.js';
 import type {
   CookieExpectation,
+  FormDataExpectation,
   HeaderExpectation,
   MatcherContext,
   MatcherResult,
+  QueryExpectation,
+  UrlExpectation,
 } from './types.js';
 import {
   createResult,
+  fetchMessageSummary,
   formatHeaders,
   matcherError,
   matchesValue,
+  requireFetchMessage,
+  requireRequest,
   requireResponse,
   responseSummary,
 } from './utils.js';
@@ -51,11 +57,11 @@ export function toHaveHeader(
   name: string,
   expected?: HeaderExpectation,
 ): MatcherResult {
-  const invalid = requireResponse(this, 'toHaveHeader', received);
+  const invalid = requireFetchMessage(this, 'toHaveHeader', received);
   if (invalid) return invalid;
 
-  const response = received as Response;
-  const actual = response.headers.get(name);
+  const message = received as Request | Response;
+  const actual = message.headers.get(name);
   const pass =
     actual !== null &&
     (expected === undefined || matchesValue(actual, expected));
@@ -67,14 +73,14 @@ export function toHaveHeader(
         this.utils.matcherHint('toHaveHeader'),
         '',
         expected === undefined
-          ? `Expected response to contain header ${this.utils.printExpected(name)}.`
+          ? `Expected message to contain header ${this.utils.printExpected(name)}.`
           : `Expected header:\n  ${name}: ${this.utils.printExpected(expected)}`,
         actual === null
           ? `Received header:\n  ${name}: (missing)`
           : `Received header:\n  ${name}: ${this.utils.printReceived(actual)}`,
         '',
-        'All response headers:',
-        formatHeaders(response.headers),
+        'All headers:',
+        formatHeaders(message.headers),
       ].join('\n'),
     actual,
     expected,
@@ -86,23 +92,23 @@ export async function toHaveJson(
   received: unknown,
   expected: unknown,
 ): Promise<MatcherResult> {
-  const invalid = requireResponse(this, 'toHaveJson', received);
+  const invalid = requireFetchMessage(this, 'toHaveJson', received);
   if (invalid) return invalid;
 
-  const response = received as Response;
+  const message = received as Request | Response;
   let actual: unknown;
 
   try {
-    actual = await response.clone().json();
+    actual = await message.clone().json();
   } catch (error) {
     return matcherError(
       this,
       'toHaveJson',
       [
-        'Expected response to contain valid JSON, but its body could not be parsed.',
+        'Expected message to contain valid JSON, but its body could not be parsed.',
         `Reason: ${error instanceof Error ? error.message : String(error)}`,
         '',
-        responseSummary(response),
+        fetchMessageSummary(message),
       ].join('\n'),
     );
   }
@@ -116,11 +122,11 @@ export async function toHaveJson(
       [
         this.utils.matcherHint('toHaveJson'),
         '',
-        'Response JSON did not match.',
+        'JSON body did not match.',
         difference ??
           `Expected: ${this.utils.printExpected(expected)}\nReceived: ${this.utils.printReceived(actual)}`,
         '',
-        responseSummary(response),
+        fetchMessageSummary(message),
       ].join('\n'),
     actual,
     expected,
@@ -132,14 +138,14 @@ export async function toHaveText(
   received: unknown,
   expected: string | RegExp,
 ): Promise<MatcherResult> {
-  const invalid = requireResponse(this, 'toHaveText', received);
+  const invalid = requireFetchMessage(this, 'toHaveText', received);
   if (invalid) return invalid;
 
-  const response = received as Response;
+  const message = received as Request | Response;
   let actual: string;
 
   try {
-    actual = await response.clone().text();
+    actual = await message.clone().text();
   } catch (error) {
     return matcherError(
       this,
@@ -159,7 +165,148 @@ export async function toHaveText(
         `Expected text: ${this.utils.printExpected(expected)}`,
         `Received text: ${this.utils.printReceived(actual)}`,
         '',
-        responseSummary(response),
+        fetchMessageSummary(message),
+      ].join('\n'),
+    actual,
+    expected,
+  );
+}
+
+export function toHaveMethod(
+  this: MatcherContext,
+  received: unknown,
+  expected: string,
+): MatcherResult {
+  const invalid = requireRequest(this, 'toHaveMethod', received);
+  if (invalid) return invalid;
+
+  const request = received as Request;
+  const normalizedExpected = expected.toUpperCase();
+  const pass = request.method.toUpperCase() === normalizedExpected;
+
+  return createResult(
+    pass,
+    () =>
+      [
+        this.utils.matcherHint('toHaveMethod'),
+        '',
+        `Expected method: ${this.utils.printExpected(normalizedExpected)}`,
+        `Received method: ${this.utils.printReceived(request.method)}`,
+        '',
+        fetchMessageSummary(request),
+      ].join('\n'),
+    request.method,
+    normalizedExpected,
+  );
+}
+
+export function toHaveUrl(
+  this: MatcherContext,
+  received: unknown,
+  expected: UrlExpectation,
+): MatcherResult {
+  const invalid = requireRequest(this, 'toHaveUrl', received);
+  if (invalid) return invalid;
+
+  const request = received as Request;
+  const url = new URL(request.url);
+  const actual =
+    typeof expected === 'string' && expected.startsWith('/')
+      ? `${url.pathname}${url.search}${url.hash}`
+      : request.url;
+  const normalizedExpected =
+    expected instanceof URL ? expected.toString() : expected;
+  const pass =
+    normalizedExpected instanceof RegExp
+      ? matchesValue(actual, normalizedExpected)
+      : actual === normalizedExpected;
+
+  return createResult(
+    pass,
+    () =>
+      [
+        this.utils.matcherHint('toHaveUrl'),
+        '',
+        `Expected URL: ${this.utils.printExpected(normalizedExpected)}`,
+        `Received URL: ${this.utils.printReceived(actual)}`,
+        '',
+        fetchMessageSummary(request),
+      ].join('\n'),
+    actual,
+    normalizedExpected,
+  );
+}
+
+export function toHaveQuery(
+  this: MatcherContext,
+  received: unknown,
+  expected: QueryExpectation,
+): MatcherResult {
+  const invalid = requireRequest(this, 'toHaveQuery', received);
+  if (invalid) return invalid;
+
+  const request = received as Request;
+  const actual = searchParamsToObject(new URL(request.url).searchParams);
+  const pass = this.equals(actual, expected);
+  const difference = pass ? undefined : this.utils.diff(expected, actual);
+
+  return createResult(
+    pass,
+    () =>
+      [
+        this.utils.matcherHint('toHaveQuery'),
+        '',
+        'Request query parameters did not match.',
+        difference ??
+          `Expected: ${this.utils.printExpected(expected)}\nReceived: ${this.utils.printReceived(actual)}`,
+        '',
+        fetchMessageSummary(request),
+      ].join('\n'),
+    actual,
+    expected,
+  );
+}
+
+export async function toHaveFormData(
+  this: MatcherContext,
+  received: unknown,
+  expected: FormDataExpectation,
+): Promise<MatcherResult> {
+  const invalid = requireFetchMessage(this, 'toHaveFormData', received);
+  if (invalid) return invalid;
+
+  const message = received as Request | Response;
+  let actual: Record<string, unknown>;
+
+  try {
+    actual = formDataToObject(await message.clone().formData());
+  } catch (error) {
+    return matcherError(
+      this,
+      'toHaveFormData',
+      [
+        'Expected message to contain valid form data, but its body could not be parsed.',
+        `Reason: ${error instanceof Error ? error.message : String(error)}`,
+        '',
+        fetchMessageSummary(message),
+      ].join('\n'),
+    );
+  }
+
+  const pass = this.equals(actual, expected);
+  const difference = pass ? undefined : this.utils.diff(expected, actual);
+
+  return createResult(
+    pass,
+    () =>
+      [
+        this.utils.matcherHint('toHaveFormData'),
+        '',
+        'Form data did not match.',
+        difference ??
+          `Expected: ${this.utils.printExpected(expected)}\nReceived: ${this.utils.printReceived(actual)}`,
+        '',
+        fetchMessageSummary(message),
       ].join('\n'),
     actual,
     expected,
@@ -242,10 +389,38 @@ export function toSetCookie(
 }
 
 export const matchers = {
+  toHaveFormData,
   toHaveHeader,
   toHaveJson,
+  toHaveMethod,
+  toHaveQuery,
   toHaveStatus,
   toHaveText,
+  toHaveUrl,
   toRedirectTo,
   toSetCookie,
 };
+
+function searchParamsToObject(
+  searchParams: URLSearchParams,
+): Record<string, string | string[]> {
+  const result: Record<string, string | string[]> = {};
+
+  for (const key of new Set(searchParams.keys())) {
+    const values = searchParams.getAll(key);
+    result[key] = values.length === 1 ? values[0]! : values;
+  }
+
+  return result;
+}
+
+function formDataToObject(formData: FormData): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  for (const key of new Set(formData.keys())) {
+    const values = formData.getAll(key);
+    result[key] = values.length === 1 ? values[0]! : values;
+  }
+
+  return result;
+}
