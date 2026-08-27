@@ -161,6 +161,27 @@ describe('toRedirectTo', () => {
       /Expected redirect/,
     );
   });
+
+  test('redacts query values from redirect diagnostics', () => {
+    const response = new Response(null, {
+      status: 302,
+      headers: {
+        location: '/login?token=actual-secret&next=home',
+      },
+    });
+
+    let message = '';
+    try {
+      expect(response).toRedirectTo('/login?token=expected-secret');
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('token=%5Bredacted%5D');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+    expect(message).not.toContain('next=home');
+  });
 });
 
 describe('toSetCookie', () => {

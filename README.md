@@ -185,8 +185,8 @@ The matchers use structural checks rather than `instanceof Response`, allowing
 responses created in another JavaScript realm or by compatible runtimes.
 Failure diagnostics redact `Authorization`, `Proxy-Authorization`, `Cookie`,
 `Set-Cookie`, and credential-like headers (including API key, token, secret, and
-password), as well as query values in request URLs, so credentials do not leak
-into test or CI logs.
+password), as well as query values in request and redirect URLs, so credentials
+do not leak into test or CI logs.
 
 ## License
 

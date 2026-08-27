@@ -117,11 +117,15 @@ export function matchesRegExp(actual: string, expected: RegExp): boolean {
 export function redactHeaderValue(name: string, value: unknown): unknown {
   const normalizedName = name.toLowerCase();
 
-  return (
+  if (
     SENSITIVE_HEADER_NAMES.has(normalizedName) ||
-      SENSITIVE_HEADER_SUFFIX.test(normalizedName)
-  )
-    ? '[redacted]'
+    SENSITIVE_HEADER_SUFFIX.test(normalizedName)
+  ) {
+    return '[redacted]';
+  }
+
+  return normalizedName === 'location' && typeof value === 'string'
+    ? redactUrl(value)
     : value;
 }
 

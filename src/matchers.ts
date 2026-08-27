@@ -336,6 +336,9 @@ export function toRedirectTo(
   const response = received as Response;
   const location = response.headers.get('location');
   const expected = expectedLocation.toString();
+  const displayedLocation =
+    location === null ? null : redactUrl(location);
+  const displayedExpected = redactUrl(expected);
   const statusMatches =
     expectedStatus === undefined
       ? response.status >= 300 && response.status < 400
@@ -348,13 +351,13 @@ export function toRedirectTo(
       [
         this.utils.matcherHint('toRedirectTo'),
         '',
-        `Expected redirect: ${expectedStatus ?? '3xx'} ${this.utils.printExpected(expected)}`,
-        `Received response: ${response.status} ${this.utils.printReceived(location)}`,
+        `Expected redirect: ${expectedStatus ?? '3xx'} ${this.utils.printExpected(displayedExpected)}`,
+        `Received response: ${response.status} ${this.utils.printReceived(displayedLocation)}`,
         '',
         responseSummary(response),
       ].join('\n'),
-    { location, status: response.status },
-    { location: expected, status: expectedStatus ?? '3xx' },
+    { location: displayedLocation, status: response.status },
+    { location: displayedExpected, status: expectedStatus ?? '3xx' },
   );
 }
 
