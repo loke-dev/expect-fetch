@@ -254,6 +254,23 @@ describe('toSetCookie', () => {
 });
 
 describe('request matchers', () => {
+  test('redacts query values from URL failure diagnostics', () => {
+    const request = new Request(
+      'https://example.test/reset?token=actual-secret&user=ada',
+    );
+
+    let message = '';
+    try {
+      expect(request).toHaveUrl('/reset?token=expected-secret');
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('token=%5Bredacted%5D');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+  });
+
   test('matches methods case-insensitively', () => {
     const request = new Request('https://example.test/users', {
       method: 'POST',

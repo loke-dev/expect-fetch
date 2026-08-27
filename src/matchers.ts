@@ -19,6 +19,7 @@ import {
   matcherError,
   matchesValue,
   redactHeaderValue,
+  redactUrl,
   requireFetchMessage,
   requireRequest,
   requireResponse,
@@ -221,6 +222,11 @@ export function toHaveUrl(
       : request.url;
   const normalizedExpected =
     expected instanceof URL ? expected.toString() : expected;
+  const displayedActual = redactUrl(actual);
+  const displayedExpected =
+    normalizedExpected instanceof RegExp
+      ? normalizedExpected
+      : redactUrl(normalizedExpected);
   const pass =
     normalizedExpected instanceof RegExp
       ? matchesValue(actual, normalizedExpected)
@@ -232,13 +238,13 @@ export function toHaveUrl(
       [
         this.utils.matcherHint('toHaveUrl'),
         '',
-        `Expected URL: ${this.utils.printExpected(normalizedExpected)}`,
-        `Received URL: ${this.utils.printReceived(actual)}`,
+        `Expected URL: ${this.utils.printExpected(displayedExpected)}`,
+        `Received URL: ${this.utils.printReceived(displayedActual)}`,
         '',
         fetchMessageSummary(request),
       ].join('\n'),
-    actual,
-    normalizedExpected,
+    displayedActual,
+    displayedExpected,
   );
 }
 

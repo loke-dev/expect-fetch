@@ -125,6 +125,22 @@ export function redactHeaderValue(name: string, value: unknown): unknown {
     : value;
 }
 
+export function redactUrl(value: string): string {
+  const isAbsolute = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(value);
+  let url: URL;
+  try {
+    url = new URL(value, 'https://expect-fetch.invalid');
+  } catch {
+    return '[redacted URL]';
+  }
+  const names = [...new Set(url.searchParams.keys())];
+  if (names.length === 0) return value;
+
+  const search = new URLSearchParams(names.map((name) => [name, '[redacted]']));
+  url.search = search.toString();
+  return isAbsolute ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
+}
+
 export function formatHeaders(headers: Headers): string {
   const entries = [...headers.entries()].sort(([a], [b]) =>
     a.localeCompare(b),
@@ -153,7 +169,7 @@ export function fetchMessageSummary(message: Request | Response): string {
   }
 
   return [
-    `Request: ${message.method} ${message.url}`,
+    `Request: ${message.method} ${redactUrl(message.url)}`,
     'Headers:',
     formatHeaders(message.headers),
   ].join('\n');

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Redact query values from URL failure diagnostics.
 - Redact API key, token, and secret header values from matcher failure
   diagnostics.
 - Redact authorization and cookie values from matcher failure diagnostics.
