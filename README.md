@@ -1,6 +1,6 @@
 # expect-fetch
 
-Jest DOM-style assertions for native Fetch API requests and responses.
+Vitest matchers for native Fetch API requests and responses.
 
 `expect-fetch` adds expressive HTTP matchers to Vitest without mocking
 `globalThis.fetch`. Use it to test Next.js route handlers, Remix loaders,
