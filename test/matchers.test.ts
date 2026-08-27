@@ -182,6 +182,26 @@ describe('toRedirectTo', () => {
     expect(message).not.toContain('expected-secret');
     expect(message).not.toContain('next=home');
   });
+
+  test('redacts credentials from redirect diagnostics', () => {
+    const response = new Response(null, {
+      status: 302,
+      headers: {
+        location: 'https://user:actual-secret@example.test/login',
+      },
+    });
+
+    let message = '';
+    try {
+      expect(response).toRedirectTo('/other');
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('https://example.test/login');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('user@');
+  });
 });
 
 describe('toSetCookie', () => {

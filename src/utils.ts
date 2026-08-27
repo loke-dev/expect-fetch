@@ -138,10 +138,20 @@ export function redactUrl(value: string): string {
     return '[redacted URL]';
   }
   const names = [...new Set(url.searchParams.keys())];
-  if (names.length === 0) return value;
+  const hasCredentials = url.username !== '' || url.password !== '';
+  if (names.length === 0 && !hasCredentials) return value;
 
-  const search = new URLSearchParams(names.map((name) => [name, '[redacted]']));
-  url.search = search.toString();
+  if (hasCredentials) {
+    url.username = '';
+    url.password = '';
+  }
+
+  if (names.length > 0) {
+    const search = new URLSearchParams(
+      names.map((name) => [name, '[redacted]']),
+    );
+    url.search = search.toString();
+  }
   return isAbsolute ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
 }
 

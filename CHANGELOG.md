@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Redact embedded URL credentials from matcher failure diagnostics.
 - Redact query values from URL failure diagnostics.
 - Redact API key, token, and secret header values from matcher failure
   diagnostics.
