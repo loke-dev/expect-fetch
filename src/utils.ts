@@ -139,7 +139,8 @@ export function redactUrl(value: string): string {
   }
   const names = [...new Set(url.searchParams.keys())];
   const hasCredentials = url.username !== '' || url.password !== '';
-  if (names.length === 0 && !hasCredentials) return value;
+  const hasFragment = url.hash !== '';
+  if (names.length === 0 && !hasCredentials && !hasFragment) return value;
 
   if (hasCredentials) {
     url.username = '';
@@ -152,7 +153,13 @@ export function redactUrl(value: string): string {
     );
     url.search = search.toString();
   }
-  return isAbsolute ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
+
+  const redactedHash = hasFragment ? '#[redacted]' : '';
+  if (hasFragment) url.hash = '';
+  const redactedUrl = isAbsolute
+    ? url.toString()
+    : `${url.pathname}${url.search}`;
+  return `${redactedUrl}${redactedHash}`;
 }
 
 export function formatHeaders(headers: Headers): string {

@@ -202,6 +202,23 @@ describe('toRedirectTo', () => {
     expect(message).not.toContain('actual-secret');
     expect(message).not.toContain('user@');
   });
+
+  test('redacts URL fragments from failure diagnostics', () => {
+    const request = new Request(
+      'https://example.test/callback#access_token=actual-secret',
+    );
+
+    let message = '';
+    try {
+      expect(request).toHaveUrl('/other#access_token=expected-secret');
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('#[redacted]');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+  });
 });
 
 describe('toSetCookie', () => {
