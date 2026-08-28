@@ -346,6 +346,9 @@ describe('request matchers', () => {
     );
 
     expect(request).toHaveUrl('/users?page=2#results');
+    expect(request).toHaveUrl('?page=2#results');
+    expect(request).toHaveUrl('#results');
+    expect(request).toHaveUrl('users?page=2#results');
     expect(request).toHaveUrl(
       'https://example.test/users?page=2#results',
     );

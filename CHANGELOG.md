@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Resolve query-only, fragment-only, and path-relative URL expectations.
 - Redact embedded URL credentials from matcher failure diagnostics.
 - Redact query values from URL failure diagnostics.
 - Redact URL fragments from matcher failure diagnostics.

@@ -216,21 +216,28 @@ export function toHaveUrl(
 
   const request = received as Request;
   const url = new URL(request.url);
-  const actual =
-    typeof expected === 'string' && expected.startsWith('/')
-      ? `${url.pathname}${url.search}${url.hash}`
-      : request.url;
+  const relative =
+    typeof expected === 'string' && !/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(expected);
+  const actual = relative ? requestPath(url) : request.url;
   const normalizedExpected =
     expected instanceof URL ? expected.toString() : expected;
+  let comparableExpected: string | RegExp = normalizedExpected;
+  if (relative) {
+    try {
+      comparableExpected = requestPath(new URL(expected, url));
+    } catch {
+      comparableExpected = expected;
+    }
+  }
   const displayedActual = redactUrl(actual);
   const displayedExpected =
     normalizedExpected instanceof RegExp
       ? normalizedExpected
       : redactUrl(normalizedExpected);
   const pass =
-    normalizedExpected instanceof RegExp
-      ? matchesValue(actual, normalizedExpected)
-      : actual === normalizedExpected;
+    comparableExpected instanceof RegExp
+      ? matchesValue(actual, comparableExpected)
+      : actual === comparableExpected;
 
   return createResult(
     pass,
@@ -437,6 +444,10 @@ function searchParamsToObject(
   });
 
   return Object.fromEntries(entries);
+}
+
+function requestPath(url: URL): string {
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 function redactQueryValues(
