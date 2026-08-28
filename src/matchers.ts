@@ -259,7 +259,12 @@ export function toHaveQuery(
   const request = received as Request;
   const actual = searchParamsToObject(new URL(request.url).searchParams);
   const pass = this.equals(actual, expected);
-  const difference = pass ? undefined : this.utils.diff(expected, actual);
+  const displayedActual = redactQueryValues(actual);
+  const displayedExpected = redactQueryValues(expected);
+  const difference =
+    pass || this.equals(displayedExpected, displayedActual)
+      ? undefined
+      : this.utils.diff(displayedExpected, displayedActual);
 
   return createResult(
     pass,
@@ -269,12 +274,12 @@ export function toHaveQuery(
         '',
         'Request query parameters did not match.',
         difference ??
-          `Expected: ${this.utils.printExpected(expected)}\nReceived: ${this.utils.printReceived(actual)}`,
+          `Expected: ${this.utils.printExpected(displayedExpected)}\nReceived: ${this.utils.printReceived(displayedActual)}`,
         '',
         fetchMessageSummary(request),
       ].join('\n'),
-    actual,
-    expected,
+    displayedActual,
+    displayedExpected,
   );
 }
 
@@ -432,6 +437,17 @@ function searchParamsToObject(
   });
 
   return Object.fromEntries(entries);
+}
+
+function redactQueryValues(
+  query: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(query).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value.map(() => '[redacted]') : '[redacted]',
+    ]),
+  );
 }
 
 function formDataToObject(formData: FormData): Record<string, unknown> {

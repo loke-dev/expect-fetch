@@ -349,6 +349,29 @@ describe('request matchers', () => {
     });
   });
 
+  test('redacts query values from failure diagnostics', () => {
+    const request = new Request(
+      'https://example.test/search?token=actual-secret&tag=private-value',
+    );
+
+    let message = '';
+    try {
+      expect(request).toHaveQuery({
+        token: 'expected-secret',
+        tag: 'expected-value',
+      });
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('token');
+    expect(message).toContain('[redacted]');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+    expect(message).not.toContain('private-value');
+    expect(message).not.toContain('expected-value');
+  });
+
   test('preserves query names that overlap object prototype properties', () => {
     const request = new Request(
       'https://example.test/search?__proto__=safe&constructor=native',
