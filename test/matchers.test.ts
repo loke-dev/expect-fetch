@@ -43,9 +43,12 @@ describe('toHaveHeader', () => {
         authorization: 'Bearer actual-secret',
         'cf-access-client-secret': 'cloudflare-secret',
         cookie: 'session=cookie-secret',
+        'x-authorization': 'Bearer prefixed-secret',
         'x-access-key': 'access-key-secret',
         'x-api-key': 'api-key-secret',
         'x-auth-token': 'auth-token-secret',
+        'x-proxy-authorization': 'Basic prefixed-secret',
+        'x-set-cookie': 'prefixed-cookie-secret',
         'x-user-password': 'user-password-value',
         'x_user_password': 'underscore-password-value',
         'x-credential': 'credential-value',
@@ -72,6 +75,8 @@ describe('toHaveHeader', () => {
     expect(message).not.toContain('cloudflare-secret');
     expect(message).not.toContain('expected-secret');
     expect(message).not.toContain('cookie-secret');
+    expect(message).not.toContain('prefixed-secret');
+    expect(message).not.toContain('prefixed-cookie-secret');
     expect(message).not.toContain('user-password-value');
     expect(message).not.toContain('underscore-password-value');
     expect(message).not.toContain('credential-value');

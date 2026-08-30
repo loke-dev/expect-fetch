@@ -11,7 +11,7 @@ const SENSITIVE_HEADER_NAMES = new Set([
   'set-cookie',
 ]);
 const SENSITIVE_HEADER_SUFFIX =
-  /(?:^|[-_])(?:access[-_]?(?:key|token)|api[-_]?key|password|credential|secret|token)$/;
+  /(?:^|[-_])(?:access[-_]?(?:key|token)|api[-_]?key|authorization|cookie|password|credential|secret|token)$/;
 
 export function matcherError(
   context: MatcherContext,
