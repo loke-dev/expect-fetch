@@ -82,6 +82,24 @@ describe('toHaveHeader', () => {
 
     expect(request).toHaveHeader('authorization', /^Bearer /);
   });
+
+  test('redacts location patterns from failure diagnostics', () => {
+    const response = new Response(null, {
+      status: 302,
+      headers: { location: '/reset?token=actual-secret' },
+    });
+
+    let message = '';
+    try {
+      expect(response).toHaveHeader('location', /token=expected-secret/);
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('[redacted URL pattern]');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+  });
 });
 
 describe('toHaveJson', () => {
@@ -216,6 +234,23 @@ describe('toRedirectTo', () => {
     }
 
     expect(message).toContain('#[redacted]');
+    expect(message).not.toContain('actual-secret');
+    expect(message).not.toContain('expected-secret');
+  });
+
+  test('redacts URL patterns from failure diagnostics', () => {
+    const request = new Request(
+      'https://example.test/reset?token=actual-secret',
+    );
+
+    let message = '';
+    try {
+      expect(request).toHaveUrl(/token=expected-secret/);
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toContain('[redacted URL pattern]');
     expect(message).not.toContain('actual-secret');
     expect(message).not.toContain('expected-secret');
   });

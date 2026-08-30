@@ -124,9 +124,9 @@ export function redactHeaderValue(name: string, value: unknown): unknown {
     return '[redacted]';
   }
 
-  return normalizedName === 'location' && typeof value === 'string'
-    ? redactUrl(value)
-    : value;
+  if (normalizedName !== 'location') return value;
+  if (typeof value === 'string') return redactUrl(value);
+  return value instanceof RegExp ? '[redacted URL pattern]' : value;
 }
 
 export function redactUrl(value: string): string {

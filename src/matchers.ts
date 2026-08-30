@@ -232,7 +232,7 @@ export function toHaveUrl(
   const displayedActual = redactUrl(actual);
   const displayedExpected =
     normalizedExpected instanceof RegExp
-      ? normalizedExpected
+      ? '[redacted URL pattern]'
       : redactUrl(normalizedExpected);
   const pass =
     comparableExpected instanceof RegExp
